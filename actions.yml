@@ -1,0 +1,14 @@
+name: "Oligo Scanner Action"
+description: "Run Oligo Scanner on pull requests"
+
+inputs:
+  scan-args:
+    description: "Custom scanner arguments"
+    required: false
+  results-file-name:
+    description: "File name of the result SARIF file"
+    required: false
+
+runs:
+  using: "docker"
+  image: "ubuntu-latest"

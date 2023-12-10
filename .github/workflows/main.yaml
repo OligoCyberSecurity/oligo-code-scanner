@@ -1,0 +1,23 @@
+name: Oligo Code Scanning
+
+permissions:
+  contents: read
+  security-events: write
+
+on:
+  workflow_call:
+    inputs:
+      scan-args:
+        description: "Custom scanner arguments (See https://google.github.io/osv-scanner/usage/ for options, you cannot set --format or --output)"
+        type: string
+
+      results-file-name:
+        description: "File name of the result SARIF file"
+        type: string
+
+jobs:
+  scan-pr:
+    uses: google/osv-scanner/.github/workflows/osv-scanner-reusable-pr.yml@main
+    with:
+      scan-args: ${{ inputs.scan-args }}
+      results-file-name: ${{ inputs.results-file-name }}
