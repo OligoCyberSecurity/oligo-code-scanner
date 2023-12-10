@@ -29,7 +29,7 @@ Include the following in the file:
 
     jobs:
       scan-pr:
-        uses: "OligoCyberSecurity/oligo-code-scanner@v1.0.0"
+        uses: "OligoCyberSecurity/oligo-code-scanner@v1.0.1"
 
 Custom overrides and usage examples can be found in [OSV documentation](cloudposse/github-action-aws-region-reduction-map@0.2.1).
 
