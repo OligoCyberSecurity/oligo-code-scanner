@@ -60,7 +60,7 @@ jobs:
         id: test-action
         with:
           path: "./"
-          # grype-version: v0.54.0 # set the same version to test that current Grype binary wasn't overwritten by the latest version
+          grype-version: v0.73.4 # set the same version to test that current Grype binary wasn't overwritten by the latest version
           fail-build: false # to prevent fail due to vuln:s on test image
 
 
