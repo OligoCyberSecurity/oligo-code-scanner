@@ -38,28 +38,24 @@ jobs:
         id: npm-lint
         run: npm run lint
 
-
-
   test-action:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Setup 
+      - name: Setup
         id: setup-node
         run: sudo apt-get install -y curl wget
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-      - name: "Scan test image"
+      - name: 'Scan test image'
         uses: ./
         id: test-action
         with:
-          path: "./"
+          path: './'
           grype-version: v0.73.4 # set the same version to test that current Grype binary wasn't overwritten by the latest version
           fail-build: false # to prevent fail due to vuln:s on test image
-
 
       - name: Print Output
         id: output
