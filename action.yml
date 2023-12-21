@@ -6,10 +6,11 @@ inputs:
     description:
       'The base path to scan. This is the path that will be used to resolve the
       differnce'
-    required: true
+    required: false
   path:
     description: 'The path to scan'
     required: true
+    default: '.'
   fail-build:
     description:
       'Set to false to avoid failing based on severity-cutoff. Default is to
