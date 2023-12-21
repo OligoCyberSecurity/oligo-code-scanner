@@ -51,7 +51,7 @@ jobs:
 
       - name: Setup 
         id: setup-node
-        run: apt-get install -y curl wget
+        run: sudo apt-get install -y curl wget
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
