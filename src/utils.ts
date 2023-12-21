@@ -59,7 +59,7 @@ export function getResultsDiff(
       results.push(headItem)
     }
   }
-  return Array.from(new Set(results))
+  return results
 }
 export function mapToReport(
   results: IGrypeFinding[]
