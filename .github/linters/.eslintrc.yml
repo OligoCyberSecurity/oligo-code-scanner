@@ -2,7 +2,14 @@ env:
   node: true
   es6: true
   jest: true
-
+settings:
+  # uses 'eslint-import-resolver-foo':
+  import/resolver: 
+    typescript:
+      alwaysTryTypes: true
+      project: './tsconfig.json'
+    "node": 
+      "extensions": [".js", ".jsx", ".ts", ".tsx"]
 globals:
   Atomics: readonly
   SharedArrayBuffer: readonly
@@ -33,6 +40,9 @@ extends:
   - plugin:@typescript-eslint/recommended
   - plugin:github/recommended
   - plugin:jest/recommended
+  - plugin:import/warnings
+  - plugin:import/errors
+  - plugin:import/typescript
 
 rules:
   {

@@ -1,17 +1,16 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
 import { getResultsDiff, runScan, sourceInput, mapToReport } from './utils'
 import tablemark from 'tablemark'
 
 /**
  * The main function for the action.
  */
-export async function run() {
+export async function run(): Promise<void> {
   try {
     core.debug(new Date().toTimeString())
     // Grype accepts several input options, initially this action is supporting both `image` and `path`, so
     // a check must happen to ensure one is selected at least, and then return it
-    const sourceArray = await sourceInput()
+    const sourceArray = sourceInput()
 
     const failBuild = core.getInput('fail-build') || 'true'
     const outputFormat = core.getInput('output-format') || 'json'
@@ -59,7 +58,6 @@ export async function run() {
             core.warning(`${results.length} Vulnerabilities found`)
           }
         }
-        return results
       }
     } else {
       const results = out.json
@@ -68,9 +66,8 @@ export async function run() {
       if (failBuild === 'true' && results && results?.length > 0) {
         core.setFailed(`${results.length} Vulnerabilities found`)
       }
-      return out.json
     }
-  } catch (error: any) {
-    core.setFailed(error.message)
+  } catch {
+    core.setFailed('Action failed')
   }
 }
