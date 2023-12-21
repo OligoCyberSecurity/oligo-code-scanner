@@ -36,7 +36,7 @@ export interface IGrypeFinding {
   relatedVulnerabilities: IVulnerability[]
 }
 export interface IArtifact {
-  id: string
+  id?: string
   name: string
   version: string
   type: string
@@ -47,16 +47,19 @@ export function getResultsDiff(
   head: IGrypeFinding[],
   base: IGrypeFinding[]
 ): IGrypeFinding[] {
-  return head.filter((headItem: IGrypeFinding) => {
+  const results: IGrypeFinding[] = []
+  for (const headItem of head) {
     const baseItem = base.find(
       (item: IGrypeFinding) =>
-        item.artifact.id === headItem.artifact.id &&
         item.artifact.name === headItem.artifact.name &&
         item.artifact.version === headItem.artifact.version &&
         item.vulnerability.id === headItem.vulnerability.id
     )
-    return !baseItem
-  })
+    if (!baseItem) {
+      results.push(headItem)
+    }
+  }
+  return Array.from(new Set(results))
 }
 export function mapToReport(
   results: IGrypeFinding[]
