@@ -54,10 +54,14 @@ export function mapToReport(results: IGrypeFinding[]) {
       Ecosystem: result.artifact.type,
       Source: result.vulnerability.dataSource,
       Severity: result.vulnerability.severity,
-      "CVSS": result.vulnerability.cvss?.map((cvss) => cvss.metrics?.baseScore).join(','),
+      CVSS: result.vulnerability.cvss
+        ?.map(cvss => cvss.metrics?.baseScore)
+        .join(','),
       Description: result.vulnerability.description,
-      "Related Vulnerabilities": result.relatedVulnerabilities.map((vuln) => vuln.id).join(','),
-      "Fix Versions": result.vulnerability.fix?.versions.join(','),
+      'Related Vulnerabilities': result.relatedVulnerabilities
+        .map(vuln => vuln.id)
+        .join(','),
+      'Fix Versions': result.vulnerability.fix?.versions.join(',')
     }
   })
 }

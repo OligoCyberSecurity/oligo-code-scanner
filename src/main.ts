@@ -1,8 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { getResultsDiff, runScan, sourceInput, mapToReport } from './utils';
-const tablemark = require("tablemark")
-
+import { getResultsDiff, runScan, sourceInput, mapToReport } from './utils'
+import tablemark from 'tablemark'
 
 /**
  * The main function for the action.
@@ -53,12 +52,18 @@ export async function run() {
         core.setOutput('markdown', tablemark(report))
         if (failBuild === 'true' && results.length > 0) {
           core.setFailed(`${results.length} Vulnerabilities found`)
+        } else {
+          if (results.length === 0) {
+            core.info(`No Vulnerabilities found`)
+          } else {
+            core.warning(`${results.length} Vulnerabilities found`)
+          }
         }
         return results
       }
     } else {
       const results = out.json
-      core.debug(`${results?.length} Vulnerabilities found`)
+      core.info(`${results?.length} Vulnerabilities found`)
       core.setOutput('json', results)
       if (failBuild === 'true' && results && results?.length > 0) {
         core.setFailed(`${results.length} Vulnerabilities found`)
