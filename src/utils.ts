@@ -23,7 +23,7 @@ export interface IVulnerability {
       exploitabilityScore: number
       impactScore: number
     }
-    vendorMetadata: any
+    vendorMetadata: { [id: string]: string }
   }[]
   fix?: {
     versions: string[]
@@ -42,10 +42,20 @@ export interface IArtifact {
   foundBy: string[]
   locations: string[] // note: only dir scans are supported, not image scans
 }
-export function getResultsDiff(head: IGrypeFinding[], base: IGrypeFinding[]) {
-  return _.differenceWith(head, base, _.isEqual)
+export function getResultsDiff(
+  head: IGrypeFinding[],
+  base: IGrypeFinding[]
+): IGrypeFinding[] {
+  const diff = _.differenceWith(head, base, (x, y) => {
+    return _.isEqual(x, y)
+  }).map(result => {
+    return result
+  })
+  return diff
 }
-export function mapToReport(results: IGrypeFinding[]) {
+export function mapToReport(
+  results: IGrypeFinding[]
+): { [key: string]: string | undefined }[] {
   return results.map(result => {
     return {
       CVE: result.vulnerability.id,
@@ -65,8 +75,8 @@ export function mapToReport(results: IGrypeFinding[]) {
     }
   })
 }
-async function downloadGrype(version = grypeVersion) {
-  let url = `https://raw.githubusercontent.com/anchore/grype/main/install.sh`
+async function downloadGrype(version = grypeVersion): Promise<string> {
+  const url = `https://raw.githubusercontent.com/anchore/grype/main/install.sh`
 
   core.debug(`Installing ${version}`)
 
@@ -76,15 +86,15 @@ async function downloadGrype(version = grypeVersion) {
   // Make sure the tool's executable bit is set
   await exec.exec(`chmod +x ${installPath}`)
 
-  let cmd = `${installPath} -b ${installPath}_grype ${version}`
+  const cmd = `${installPath} -b ${installPath}_grype ${version}`
   await exec.exec(cmd)
-  let grypePath = `${installPath}_grype/grype`
+  const grypePath = `${installPath}_grype/grype`
 
   // Cache the downloaded file
   return cache.cacheFile(grypePath, `grype`, `grype`, version)
 }
 
-async function installGrype(version = grypeVersion) {
+async function installGrype(version = grypeVersion): Promise<string> {
   let grypePath = cache.find(grypeBinary, version)
   if (!grypePath) {
     // Not found, install it
@@ -97,7 +107,7 @@ async function installGrype(version = grypeVersion) {
 }
 
 // Determines if multiple arguments are defined
-export function multipleDefined(...args: string[]) {
+export function multipleDefined(...args: string[]): boolean {
   let defined = false
   for (const a of args) {
     if (defined && a) {
@@ -112,8 +122,8 @@ export function multipleDefined(...args: string[]) {
 
 export function sourceInput(): { head: string; base?: string } {
   // var image = core.getInput("image");
-  var path = core.getInput('head-path')
-  var basePath = core.getInput('base-path')
+  let path = core.getInput('head-path')
+  const basePath = core.getInput('base-path')
   // var sbom = core.getInput("sbom");
 
   // if (multipleDefined(image, path, sbom)) {
@@ -135,9 +145,9 @@ export function sourceInput(): { head: string; base?: string } {
     path = '.'
   }
   if (basePath) {
-    return { head: `dir:${path}`, base: 'dir:' + basePath }
+    return { head: `dir:${path}`, base: `dir:${basePath}` }
   }
-  return { head: 'dir:' + path }
+  return { head: `dir:${path}` }
 }
 
 /**
@@ -160,8 +170,11 @@ export async function runScan({
   outputFormat: string
   addCpesIfNone: string
   byCve: string
-  vex: any
-}) {
+  vex?: string
+}): Promise<{
+  sarif?: string
+  json?: IGrypeFinding[]
+}> {
   const out: {
     sarif?: string
     json?: IGrypeFinding[]
@@ -174,7 +187,7 @@ export async function runScan({
 
   const SEVERITY_LIST = ['negligible', 'low', 'medium', 'high', 'critical']
   const FORMAT_LIST = ['sarif', 'json', 'table']
-  let cmdArgs: string[] = []
+  const cmdArgs: string[] = []
 
   if (core.isDebug()) {
     cmdArgs.push(`-vv`)
@@ -209,23 +222,22 @@ export async function runScan({
       `Invalid output-format value is set to ${outputFormat} - please ensure you are choosing either json or sarif`
     )
   }
-  const grypeVersion = core.getInput('grype-version') || GRYPE_VERSION
   core.debug(`Installing grype version ${grypeVersion}`)
   await installGrype(grypeVersion)
 
-  core.debug('Source: ' + source)
-  core.debug('Fail Build: ' + failBuild)
-  core.debug('Severity Cutoff: ' + severityCutoff)
-  core.debug('Only Fixed: ' + onlyFixed)
-  core.debug('Add Missing CPEs: ' + addCpesIfNone)
-  core.debug('Orient by CVE: ' + byCve)
-  core.debug('Output Format: ' + outputFormat)
+  core.debug(`Source: ${source}`)
+  core.debug(`Fail Build: ${failBuild}`)
+  core.debug(`Severity Cutoff: ${severityCutoff}`)
+  core.debug(`Only Fixed: ${onlyFixed}`)
+  core.debug(`Add Missing CPEs: ${addCpesIfNone}`)
+  core.debug(`Orient by CVE: ${byCve}`)
+  core.debug(`Output Format: ${outputFormat}`)
 
   core.debug('Creating options for GRYPE analyzer')
 
   // Run the grype analyzer
   let cmdOutput = ''
-  let cmd = `${grypeBinary}`
+  const cmd = `${grypeBinary}`
   if (severityCutoff !== '') {
     cmdArgs.push('--fail-on')
     cmdArgs.push(severityCutoff.toLowerCase())
@@ -255,7 +267,7 @@ export async function runScan({
   })
 
   const exitCode = await core.group(`${cmd} output...`, async () => {
-    core.info(`Executing: ${cmd} ` + cmdArgs.join(' '))
+    core.info(`Executing: ${cmd} ${cmdArgs.join(' ')}`)
 
     return exec.exec(cmd, cmdArgs, {
       env,

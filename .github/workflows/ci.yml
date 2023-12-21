@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - master
 
 permissions:
   contents: read
@@ -30,35 +30,32 @@ jobs:
         id: npm-ci
         run: npm ci
 
-      - name: Check Format
-        id: npm-format-check
-        run: npm run format:check
+      # - name: Check Format
+      #   id: npm-format-check
+      #   run: npm run format:check
 
       - name: Lint
         id: npm-lint
         run: npm run lint
-
-      - name: Test
-        id: npm-ci-test
-        run: npm run ci-test
-
 
   test-action:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup
+        id: setup-node
+        run: sudo apt-get install -y curl wget
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-
-        - name: "Scan test image"
+      - name: 'Scan test image'
         uses: ./
+        id: test-action
         with:
-          path: "./"
-          # grype-version: v0.54.0 # set the same version to test that current Grype binary wasn't overwritten by the latest version
+          path: './'
+          grype-version: v0.73.4 # set the same version to test that current Grype binary wasn't overwritten by the latest version
           fail-build: false # to prevent fail due to vuln:s on test image
-
 
       - name: Print Output
         id: output

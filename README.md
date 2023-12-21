@@ -6,7 +6,7 @@ This GitHub Action uses [OSV Scanner](https://google.github.io/osv-scanner/) to 
 
 You will be notified of any new vulnerabilities introduced through the feature branch. You can also choose to [prevent merging](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging) if new vulnerabilities are introduced through the feature branch.
 
-### Usage
+## Usage
 
 In your project repository, create a new file `.github/workflows/oligo-scanner-pr.yml` (Adding to an existing workflow file is also possible).
 

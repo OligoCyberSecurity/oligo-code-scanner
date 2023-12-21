@@ -48453,7 +48453,12 @@ const GRYPE_VERSION = 'v0.73.4';
 const grypeBinary = 'grype';
 const grypeVersion = core.getInput('grype-version') || GRYPE_VERSION;
 function getResultsDiff(head, base) {
-    return lodash_default().differenceWith(head, base, (lodash_default()).isEqual);
+    const diff = lodash_default().differenceWith(head, base, (x, y) => {
+        return lodash_default().isEqual(x, y);
+    }).map(result => {
+        return result;
+    });
+    return diff;
 }
 function mapToReport(results) {
     return results.map(result => {
@@ -48476,16 +48481,16 @@ function mapToReport(results) {
 }
 function downloadGrype(version = grypeVersion) {
     return __awaiter(this, void 0, void 0, function* () {
-        let url = `https://raw.githubusercontent.com/anchore/grype/main/install.sh`;
+        const url = `https://raw.githubusercontent.com/anchore/grype/main/install.sh`;
         core.debug(`Installing ${version}`);
         // TODO: when grype starts supporting unreleased versions, support it here
         // Download the installer, and run
         const installPath = yield tool_cache.downloadTool(url);
         // Make sure the tool's executable bit is set
         yield exec.exec(`chmod +x ${installPath}`);
-        let cmd = `${installPath} -b ${installPath}_grype ${version}`;
+        const cmd = `${installPath} -b ${installPath}_grype ${version}`;
         yield exec.exec(cmd);
-        let grypePath = `${installPath}_grype/grype`;
+        const grypePath = `${installPath}_grype/grype`;
         // Cache the downloaded file
         return tool_cache.cacheFile(grypePath, `grype`, `grype`, version);
     });
@@ -48517,8 +48522,8 @@ function multipleDefined(...args) {
 }
 function sourceInput() {
     // var image = core.getInput("image");
-    var path = core.getInput('head-path');
-    var basePath = core.getInput('base-path');
+    let path = core.getInput('head-path');
+    const basePath = core.getInput('base-path');
     // var sbom = core.getInput("sbom");
     // if (multipleDefined(image, path, sbom)) {
     //   throw new Error(
@@ -48536,9 +48541,9 @@ function sourceInput() {
         path = '.';
     }
     if (basePath) {
-        return { head: `dir:${path}`, base: 'dir:' + basePath };
+        return { head: `dir:${path}`, base: `dir:${basePath}` };
     }
-    return { head: 'dir:' + path };
+    return { head: `dir:${path}` };
 }
 /**
  * Wait for a number of milliseconds. Resolves with 'done!' after the wait time.
@@ -48549,7 +48554,7 @@ function runScan({ source, failBuild, severityCutoff, onlyFixed, outputFormat, a
         const env = Object.assign(Object.assign({}, process.env), { GRYPE_CHECK_FOR_APP_UPDATE: 'false' });
         const SEVERITY_LIST = ['negligible', 'low', 'medium', 'high', 'critical'];
         const FORMAT_LIST = ['sarif', 'json', 'table'];
-        let cmdArgs = [];
+        const cmdArgs = [];
         if (core.isDebug()) {
             cmdArgs.push(`-vv`);
         }
@@ -48566,20 +48571,19 @@ function runScan({ source, failBuild, severityCutoff, onlyFixed, outputFormat, a
             item === outputFormat.toLowerCase())) {
             throw new Error(`Invalid output-format value is set to ${outputFormat} - please ensure you are choosing either json or sarif`);
         }
-        const grypeVersion = core.getInput('grype-version') || GRYPE_VERSION;
         core.debug(`Installing grype version ${grypeVersion}`);
         yield installGrype(grypeVersion);
-        core.debug('Source: ' + source);
-        core.debug('Fail Build: ' + failBuild);
-        core.debug('Severity Cutoff: ' + severityCutoff);
-        core.debug('Only Fixed: ' + onlyFixed);
-        core.debug('Add Missing CPEs: ' + addCpesIfNone);
-        core.debug('Orient by CVE: ' + byCve);
-        core.debug('Output Format: ' + outputFormat);
+        core.debug(`Source: ${source}`);
+        core.debug(`Fail Build: ${failBuild}`);
+        core.debug(`Severity Cutoff: ${severityCutoff}`);
+        core.debug(`Only Fixed: ${onlyFixed}`);
+        core.debug(`Add Missing CPEs: ${addCpesIfNone}`);
+        core.debug(`Orient by CVE: ${byCve}`);
+        core.debug(`Output Format: ${outputFormat}`);
         core.debug('Creating options for GRYPE analyzer');
         // Run the grype analyzer
         let cmdOutput = '';
-        let cmd = `${grypeBinary}`;
+        const cmd = `${grypeBinary}`;
         if (severityCutoff !== '') {
             cmdArgs.push('--fail-on');
             cmdArgs.push(severityCutoff.toLowerCase());
@@ -48607,7 +48611,7 @@ function runScan({ source, failBuild, severityCutoff, onlyFixed, outputFormat, a
             }
         });
         const exitCode = yield core.group(`${cmd} output...`, () => __awaiter(this, void 0, void 0, function* () {
-            core.info(`Executing: ${cmd} ` + cmdArgs.join(' '));
+            core.info(`Executing: ${cmd} ${cmdArgs.join(' ')}`);
             return exec.exec(cmd, cmdArgs, {
                 env,
                 ignoreReturnCode: true,
@@ -48850,7 +48854,7 @@ function run() {
             core.debug(new Date().toTimeString());
             // Grype accepts several input options, initially this action is supporting both `image` and `path`, so
             // a check must happen to ensure one is selected at least, and then return it
-            const sourceArray = yield sourceInput();
+            const sourceArray = sourceInput();
             const failBuild = core.getInput('fail-build') || 'true';
             const outputFormat = core.getInput('output-format') || 'json';
             const severityCutoff = core.getInput('severity-cutoff') || 'medium';
@@ -48897,7 +48901,6 @@ function run() {
                             core.warning(`${results.length} Vulnerabilities found`);
                         }
                     }
-                    return results;
                 }
             }
             else {
@@ -48907,11 +48910,10 @@ function run() {
                 if (failBuild === 'true' && results && (results === null || results === void 0 ? void 0 : results.length) > 0) {
                     core.setFailed(`${results.length} Vulnerabilities found`);
                 }
-                return out.json;
             }
         }
-        catch (error) {
-            core.setFailed(error.message);
+        catch (_a) {
+            core.setFailed('Action failed');
         }
     });
 }
