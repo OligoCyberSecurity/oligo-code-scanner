@@ -31220,13 +31220,16 @@ const GRYPE_VERSION = 'v0.73.4';
 const grypeBinary = 'grype';
 const grypeVersion = core.getInput('grype-version') || GRYPE_VERSION;
 function getResultsDiff(head, base) {
-    return head.filter((headItem) => {
-        const baseItem = base.find((item) => item.artifact.id === headItem.artifact.id &&
-            item.artifact.name === headItem.artifact.name &&
+    const results = [];
+    for (const headItem of head) {
+        const baseItem = base.find((item) => item.artifact.name === headItem.artifact.name &&
             item.artifact.version === headItem.artifact.version &&
             item.vulnerability.id === headItem.vulnerability.id);
-        return !baseItem;
-    });
+        if (!baseItem) {
+            results.push(headItem);
+        }
+    }
+    return Array.from(new Set(results));
 }
 function mapToReport(results) {
     return results.map(result => {
