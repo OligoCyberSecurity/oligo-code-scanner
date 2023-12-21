@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as cache from '@actions/tool-cache'
-import _ from 'lodash'
+
 import stream from 'stream'
 const GRYPE_VERSION = 'v0.73.4'
 const grypeBinary = 'grype'
@@ -36,6 +36,7 @@ export interface IGrypeFinding {
   relatedVulnerabilities: IVulnerability[]
 }
 export interface IArtifact {
+  id: string
   name: string
   version: string
   type: string
@@ -46,12 +47,16 @@ export function getResultsDiff(
   head: IGrypeFinding[],
   base: IGrypeFinding[]
 ): IGrypeFinding[] {
-  const diff = _.differenceWith(head, base, (x, y) => {
-    return _.isEqual(x, y)
-  }).map(result => {
-    return result
+  return head.filter((headItem: IGrypeFinding) => {
+    const baseItem = base.find(
+      (item: IGrypeFinding) =>
+        item.artifact.id === headItem.artifact.id &&
+        item.artifact.name === headItem.artifact.name &&
+        item.artifact.version === headItem.artifact.version &&
+        item.vulnerability.id === headItem.vulnerability.id
+    )
+    return !baseItem
   })
-  return diff
 }
 export function mapToReport(
   results: IGrypeFinding[]
