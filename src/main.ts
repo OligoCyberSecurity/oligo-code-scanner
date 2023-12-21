@@ -45,7 +45,7 @@ export async function run(): Promise<void> {
       // core.setOutput("json", out.json);
       if (out.json && outbase.json) {
         const results = getResultsDiff(out.json, outbase.json)
-        core.debug(`${results.length} Vulnerabilities found`)
+        core.warning(`${results.length} Vulnerabilities found`)
         const report = mapToReport(results)
         core.setOutput('json', report)
         core.setOutput('markdown', tablemark(report))
