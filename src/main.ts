@@ -46,9 +46,14 @@ export async function run(): Promise<void> {
       if (out.json && outbase.json) {
         const results = getResultsDiff(out.json, outbase.json)
         core.warning(`${results.length} Vulnerabilities found`)
-        const report = mapToReport(results)
-        core.setOutput('json', report)
-        core.setOutput('markdown', tablemark(report))
+        if (results.length > 0) {
+          const report = mapToReport(results)
+          core.setOutput('json', report)
+          core.setOutput('markdown', tablemark(report))
+        } else {
+          core.setOutput('json', [])
+          core.setOutput('markdown', '')
+        }
         if (failBuild === 'true' && results.length > 0) {
           core.setFailed(`${results.length} Vulnerabilities found`)
         } else {
