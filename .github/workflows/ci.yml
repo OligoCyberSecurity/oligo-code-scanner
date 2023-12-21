@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - master
 
 permissions:
   contents: read
@@ -51,9 +51,9 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-
-        - name: "Scan test image"
+      - name: "Scan test image"
         uses: ./
+        id: test-action
         with:
           path: "./"
           # grype-version: v0.54.0 # set the same version to test that current Grype binary wasn't overwritten by the latest version
