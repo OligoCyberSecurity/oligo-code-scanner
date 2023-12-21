@@ -48,6 +48,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Setup 
+        id: setup-node
+        run: apt-get install -y curl wget
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
