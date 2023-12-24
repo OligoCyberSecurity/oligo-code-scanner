@@ -70,7 +70,10 @@ export async function run(): Promise<void> {
       if (results) {
         core.info(`${results?.length} Vulnerabilities found`)
         core.setOutput('json', results)
-        core.setOutput('markdown', tablemark(mapToReport(results)))
+        core.info(`output json: ${JSON.stringify(results)}`)
+        if (results?.length > 0) {
+          core.setOutput('markdown', tablemark(mapToReport(results)))
+        }
       }
       if (failBuild === 'true' && results && results?.length > 0) {
         core.setFailed(`${results.length} Vulnerabilities found`)

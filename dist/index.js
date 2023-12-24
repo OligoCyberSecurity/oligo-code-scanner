@@ -31685,7 +31685,10 @@ function run() {
                 if (results) {
                     core.info(`${results === null || results === void 0 ? void 0 : results.length} Vulnerabilities found`);
                     core.setOutput('json', results);
-                    core.setOutput('markdown', tablemark_dist(mapToReport(results)));
+                    core.info(`output json: ${JSON.stringify(results)}`);
+                    if ((results === null || results === void 0 ? void 0 : results.length) > 0) {
+                        core.setOutput('markdown', tablemark_dist(mapToReport(results)));
+                    }
                 }
                 if (failBuild === 'true' && results && (results === null || results === void 0 ? void 0 : results.length) > 0) {
                     core.setFailed(`${results.length} Vulnerabilities found`);
