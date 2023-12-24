@@ -201,7 +201,6 @@ export async function runScan({
     cmdArgs.push(`-vv`)
   }
 
-  const parsedFailBuild = failBuild.toLowerCase() === 'true'
   const parsedOnlyFixed = onlyFixed.toLowerCase() === 'true'
   const parsedAddCpesIfNone = addCpesIfNone.toLowerCase() === 'true'
   const parsedByCve = byCve.toLowerCase() === 'true'
