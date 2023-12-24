@@ -31677,8 +31677,8 @@ function run() {
             }
             else {
                 const results = out.json;
-                core.info(`${results === null || results === void 0 ? void 0 : results.length} Vulnerabilities found`);
                 if (results) {
+                    core.info(`${results === null || results === void 0 ? void 0 : results.length} Vulnerabilities found`);
                     core.setOutput('json', results);
                     core.setOutput('markdown', tablemark_dist(mapToReport(results)));
                 }

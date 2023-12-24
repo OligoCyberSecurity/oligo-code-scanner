@@ -66,8 +66,9 @@ export async function run(): Promise<void> {
       }
     } else {
       const results = out.json
-      core.info(`${results?.length} Vulnerabilities found`)
+
       if (results) {
+        core.info(`${results?.length} Vulnerabilities found`)
         core.setOutput('json', results)
         core.setOutput('markdown', tablemark(mapToReport(results)))
       }
