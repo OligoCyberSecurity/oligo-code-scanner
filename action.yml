@@ -1,6 +1,8 @@
 name: 'Oligo Scanner Action'
 description: 'Run Oligo Scanner on pull requests'
-
+branding:
+  icon: 'shield'
+  color: 'purple'
 inputs:
   base-path:
     description:
@@ -37,25 +39,7 @@ inputs:
       available.  Default is false.'
     required: false
     default: 'false'
-  add-cpes-if-none:
-    description:
-      'Specify whether to autogenerate missing CPEs.  Default is false.'
-    required: false
-    default: 'false'
-  by-cve:
-    description:
-      'Specify whether to orient results by CVE rather than GHSA.  Default is
-      false.'
-    required: false
-    default: 'true'
-  grype-version:
-    description: 'A specific version of Grype to install'
-    required: false
-  vex:
-    description:
-      'Specify a list of VEX documents to consider when producing scanning
-      results.'
-    required: false
+ 
 outputs:
   sarif:
     description: 'Path to a SARIF report file for the image'

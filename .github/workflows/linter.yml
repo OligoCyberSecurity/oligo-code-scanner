@@ -37,7 +37,7 @@ jobs:
         id: super-linter
         uses: super-linter/super-linter/slim@v5
         env:
-          DEFAULT_BRANCH: main
+          DEFAULT_BRANCH: master
           FILTER_REGEX_EXCLUDE: dist/**/*
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TYPESCRIPT_DEFAULT_STYLE: prettier

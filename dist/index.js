@@ -31216,9 +31216,9 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const GRYPE_VERSION = 'v0.73.4';
+const GRYPE_VERSION = 'v0.73.5';
 const grypeBinary = 'grype';
-const grypeVersion = core.getInput('grype-version') || GRYPE_VERSION;
+const grypeVersion = GRYPE_VERSION;
 function getResultsDiff(head, base) {
     const results = [];
     for (const headItem of head) {
@@ -31293,7 +31293,7 @@ function multipleDefined(...args) {
 }
 function sourceInput() {
     // var image = core.getInput("image");
-    let path = core.getInput('head-path');
+    let path = core.getInput('path');
     const basePath = core.getInput('base-path');
     // var sbom = core.getInput("sbom");
     // if (multipleDefined(image, path, sbom)) {
@@ -31322,14 +31322,13 @@ function sourceInput() {
 function runScan({ source, failBuild, severityCutoff, onlyFixed, outputFormat, addCpesIfNone, byCve, vex }) {
     return __awaiter(this, void 0, void 0, function* () {
         const out = {};
-        const env = Object.assign(Object.assign({}, process.env), { GRYPE_CHECK_FOR_APP_UPDATE: 'false' });
+        const env = Object.assign(Object.assign({}, process.env), { GRYPE_CHECK_FOR_APP_UPDATE: 'true' });
         const SEVERITY_LIST = ['negligible', 'low', 'medium', 'high', 'critical'];
         const FORMAT_LIST = ['sarif', 'json', 'table'];
         const cmdArgs = [];
         if (core.isDebug()) {
             cmdArgs.push(`-vv`);
         }
-        const parsedFailBuild = failBuild.toLowerCase() === 'true';
         const parsedOnlyFixed = onlyFixed.toLowerCase() === 'true';
         const parsedAddCpesIfNone = addCpesIfNone.toLowerCase() === 'true';
         const parsedByCve = byCve.toLowerCase() === 'true';
@@ -31414,7 +31413,12 @@ function runScan({ source, failBuild, severityCutoff, onlyFixed, outputFormat, a
             case 'json': {
                 // const REPORT_FILE = "./results.json";
                 // fs.writeFileSync(REPORT_FILE, );
-                out.json = JSON.parse(cmdOutput).matches;
+                try {
+                    out.json = JSON.parse(cmdOutput).matches;
+                }
+                catch (_a) {
+                    out.json = [];
+                }
                 break;
             }
             default: // e.g. table
@@ -31427,15 +31431,11 @@ function runScan({ source, failBuild, severityCutoff, onlyFixed, outputFormat, a
                 // a grype problem
                 core.warning('grype had a non-zero exit status when running');
             }
-            else if (parsedFailBuild === true) {
-                core.setFailed(`Failed minimum severity level. Found vulnerabilities with level '${severityCutoff}' or higher`);
-            }
-            else {
-                // There is a non-zero exit status code with severity cut off, although there is still a chance this is grype
-                // that is broken, it will most probably be a failed severity. Using warning here will make it bubble up in the
-                // Actions UI
+            // There is a non-zero exit status code with severity cut off, although there is still a chance this is grype
+            // that is broken, it will most probably be a failed severity. Using warning here will make it bubble up in the
+            // Actions UI
+            else
                 core.warning(`Failed minimum severity level. Found vulnerabilities with level '${severityCutoff}' or higher`);
-            }
         }
         return out;
     });
@@ -31630,9 +31630,9 @@ function run() {
             const outputFormat = core.getInput('output-format') || 'json';
             const severityCutoff = core.getInput('severity-cutoff') || 'medium';
             const onlyFixed = core.getInput('only-fixed') || 'false';
-            const addCpesIfNone = core.getInput('add-cpes-if-none') || 'false';
-            const byCve = core.getInput('by-cve') || 'true';
-            const vex = core.getInput('vex') || '';
+            const addCpesIfNone = 'false';
+            const byCve = 'true';
+            const vex = '';
             const out = yield runScan({
                 source: sourceArray.head,
                 failBuild: 'false',
@@ -31657,7 +31657,7 @@ function run() {
                 // core.setOutput("json", out.json);
                 if (out.json && outbase.json) {
                     const results = getResultsDiff(out.json, outbase.json);
-                    core.warning(`${results.length} Vulnerabilities found`);
+                    core.notice(`${results.length} Vulnerabilities found`);
                     if (results.length > 0) {
                         const report = mapToReport(results);
                         core.setOutput('json', report);
@@ -31672,7 +31672,7 @@ function run() {
                     }
                     else {
                         if (results.length === 0) {
-                            core.info(`No Vulnerabilities found`);
+                            core.notice(`No Vulnerabilities found`);
                         }
                         else {
                             core.warning(`${results.length} Vulnerabilities found`);
@@ -31682,15 +31682,23 @@ function run() {
             }
             else {
                 const results = out.json;
-                core.info(`${results === null || results === void 0 ? void 0 : results.length} Vulnerabilities found`);
-                core.setOutput('json', results);
+                if (results) {
+                    core.info(`${results === null || results === void 0 ? void 0 : results.length} Vulnerabilities found`);
+                    if ((results === null || results === void 0 ? void 0 : results.length) > 0) {
+                        const report = mapToReport(results);
+                        core.setOutput('json', report);
+                        const reportTable = tablemark_dist(report);
+                        core.setOutput('markdown', reportTable);
+                        core.info(`output : ${reportTable}`);
+                    }
+                }
                 if (failBuild === 'true' && results && (results === null || results === void 0 ? void 0 : results.length) > 0) {
                     core.setFailed(`${results.length} Vulnerabilities found`);
                 }
             }
         }
-        catch (_a) {
-            core.setFailed('Action failed');
+        catch (error) {
+            core.setFailed(`Action failed ${error}`);
         }
     });
 }

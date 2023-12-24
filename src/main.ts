@@ -16,9 +16,9 @@ export async function run(): Promise<void> {
     const outputFormat = core.getInput('output-format') || 'json'
     const severityCutoff = core.getInput('severity-cutoff') || 'medium'
     const onlyFixed = core.getInput('only-fixed') || 'false'
-    const addCpesIfNone = core.getInput('add-cpes-if-none') || 'false'
-    const byCve = core.getInput('by-cve') || 'true'
-    const vex = core.getInput('vex') || ''
+    const addCpesIfNone = 'false'
+    const byCve = 'true'
+    const vex = ''
 
     const out = await runScan({
       source: sourceArray.head,
@@ -45,7 +45,7 @@ export async function run(): Promise<void> {
       // core.setOutput("json", out.json);
       if (out.json && outbase.json) {
         const results = getResultsDiff(out.json, outbase.json)
-        core.warning(`${results.length} Vulnerabilities found`)
+        core.notice(`${results.length} Vulnerabilities found`)
         if (results.length > 0) {
           const report = mapToReport(results)
           core.setOutput('json', report)
@@ -58,7 +58,7 @@ export async function run(): Promise<void> {
           core.setFailed(`${results.length} Vulnerabilities found`)
         } else {
           if (results.length === 0) {
-            core.info(`No Vulnerabilities found`)
+            core.notice(`No Vulnerabilities found`)
           } else {
             core.warning(`${results.length} Vulnerabilities found`)
           }
@@ -66,13 +66,22 @@ export async function run(): Promise<void> {
       }
     } else {
       const results = out.json
-      core.info(`${results?.length} Vulnerabilities found`)
-      core.setOutput('json', results)
+
+      if (results) {
+        core.info(`${results?.length} Vulnerabilities found`)
+        if (results?.length > 0) {
+          const report = mapToReport(results)
+          core.setOutput('json', report)
+          const reportTable = tablemark(report)
+          core.setOutput('markdown', reportTable)
+          core.info(`output : ${reportTable}`)
+        }
+      }
       if (failBuild === 'true' && results && results?.length > 0) {
         core.setFailed(`${results.length} Vulnerabilities found`)
       }
     }
-  } catch {
-    core.setFailed('Action failed')
+  } catch (error) {
+    core.setFailed(`Action failed ${error}`)
   }
 }
