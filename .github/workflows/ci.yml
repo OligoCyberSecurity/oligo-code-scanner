@@ -55,8 +55,12 @@ jobs:
         with:
           path: './'
           grype-version: v0.73.4 # set the same version to test that current Grype binary wasn't overwritten by the latest version
-          fail-build: false # to prevent fail due to vuln:s on test image
+          fail-build: 'false' # to prevent fail due to vuln:s on test image
           output-format: json
+          severity-cutoff: high
+          add-cpes-if-none: true
+          by-cve: true
+
       - name: Print Output
         id: output
         run: echo "${{ steps.test-action.outputs.markdown }}"
