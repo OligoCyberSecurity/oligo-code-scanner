@@ -7,7 +7,7 @@ inputs:
   base-path:
     description:
       'The base path to scan. This is the path that will be used to resolve the
-      differnce'
+      difference'
     required: false
   path:
     description: 'The path to scan'
