@@ -1,6 +1,8 @@
 name: 'Oligo Scanner Action'
 description: 'Run Oligo Scanner on pull requests'
-
+branding:
+  icon: 'shield'
+  color: 'purple'
 inputs:
   base-path:
     description:
