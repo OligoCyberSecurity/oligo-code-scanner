@@ -1,4 +1,5 @@
 
+
 # Oligo Code Scanner
 
 Scanning your project on each pull request can help you keep vulnerabilities out of your project.
@@ -89,10 +90,10 @@ Setting `fail-build`  to `true` will cause the action to fail. In order to block
 ## Arguments
 |Argument  |Description |Default |Required | Options |
 |--|--|--|--|--|
-| `only-fixed` | Specify whether to only report vulnerabilities that have a fix available. |  `false`| X | `false`, `true`| 
-| `severity-cutoff` |  Optionally specify the minimum vulnerability severity to trigger an "error" level ACS result. Any vulnerability with a severity less than this value will lead to a "warning" result.  Default is "medium".| `medium`| X | `negligible`, `low`, `medium`, `high`, `critical` |
-| `output-format` | Set the output parameter after successful action execution.  | `json` |X  | `json`, `sarif`, `table` |
-| `fail-build` |Set to false to avoid failing based on severity-cutoff. | `true`  | X | `true`, `false` |
-| `path` | The path of the checked-out feature branch to scan. | `.` | V  | Any valid path |
-| `base-path` | The path of the target branch to scan. This is the path that will be used to resolve the difference with the feature branch code. |  `.`|X  | Any valid path |
+| `only-fixed` | Specify whether to only report vulnerabilities that have a fix available. |  `false`| :x: | `false`, `true`| 
+| `severity-cutoff` |  Optionally specify the minimum vulnerability severity to trigger an "error" level ACS result. Any vulnerability with a severity less than this value will lead to a "warning" result.  Default is "medium".| `medium`| :x: | `negligible`, `low`, `medium`, `high`, `critical` |
+| `output-format` | Set the output parameter after successful action execution.  | `json` |:x:| `json`, `sarif`, `table` |
+| `fail-build` |Set to false to avoid failing based on severity-cutoff. | `true`  | :x: | `true`, `false` |
+| `path` | The path of the checked-out feature branch to scan. | `.` | :white_check_mark:  | Any valid path |
+| `base-path` | The path of the target branch to scan. This is the path that will be used to resolve the difference with the feature branch code. |  `.`|:x:  | Any valid path |
 
