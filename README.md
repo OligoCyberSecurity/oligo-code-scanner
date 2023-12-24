@@ -4,7 +4,7 @@
 
 Scanning your project on each pull request can help you keep vulnerabilities out of your project.
 
-This GitHub Action utilizes [Grype](https://github.com/anchore/grype) to compare a vulnerability scan of the target branch to a vulnerability scan of the feature branch, and will fail if there are new vulnerabilities found which doesn’t exist in the target branch.
+This GitHub Action utilizes [Grype](https://github.com/anchore/grype) to compare a vulnerability scan of the target branch to a vulnerability scan of the feature branch, and will fail if there are new vulnerabilities found which do not exist in the target branch.
 
 You will be notified of any new vulnerabilities introduced through the feature branch. You can also choose to [prevent merging](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging) if new vulnerabilities are introduced through the feature branch.
 
