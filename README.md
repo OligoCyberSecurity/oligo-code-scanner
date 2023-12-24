@@ -1,8 +1,9 @@
+
 # Oligo Code Scanner
 
 Scanning your project on each pull request can help you keep vulnerabilities out of your project.
 
-This GitHub Action uses [OSV Scanner](https://google.github.io/osv-scanner/) to compare a vulnerability scan of the target branch to a vulnerability scan of the feature branch, and will fail if there are new vulnerabilities found which doesn’t exist in the target branch.
+This GitHub Action utilizes [Grype](https://github.com/anchore/grype) to compare a vulnerability scan of the target branch to a vulnerability scan of the feature branch, and will fail if there are new vulnerabilities found which doesn’t exist in the target branch.
 
 You will be notified of any new vulnerabilities introduced through the feature branch. You can also choose to [prevent merging](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging) if new vulnerabilities are introduced through the feature branch.
 
@@ -12,27 +13,86 @@ In your project repository, create a new file `.github/workflows/oligo-scanner-p
 
 Include the following in the file:
 
-    name: Oligo PR Scan
+```yaml
+name: Oligo Vulnerability Scanner
 
-    # Change "main" to your default branch if you use a different name, i.e. "master"
-    on:
-      pull_request:
-        branches: [ main ]
-      merge_group:
-        branches: [ main ]
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events
+  pull_request:
+    branches:
+      - '**'
 
-    permissions:
-      # Require writing security events to upload SARIF file to security tab
-      security-events: write
-      # Only need to read contents
-      contents: read
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+jobs:
+  scan-pr:
+    name: Scan comparing base and comment on pr
+    runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.display.outputs.json }}
+    steps:
+      - name: Checkout the main branch repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secret }}
+          path: main
 
-    jobs:
-      scan-pr:
-        uses: "OligoCyberSecurity/oligo-code-scanner@v1.0.1"
+      - name: Checkout base branch repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          ref: ${{ github.event.pull_request.base.ref }}
+          token: ${{ secret }}
+          path: base
 
-Custom overrides and usage examples can be found in [OSV documentation](cloudposse/github-action-aws-region-reduction-map@0.2.1).
+      - name: Scan both feature & main branches and compare output differences
+        id: scan
+        uses: OligoCyberSecurity/oligo-code-scanner@v1.0.5
+        continue-on-error: true
+        with:
+          path: './main'
+          base-path: './base'
+          fail-build: true
+          severity-cutoff: high
+          output-format: json
+```
 
-### Using Result Files
+## Examples
+Oligo scanner saves the results in the jobs's `outputs` variable in JSON, SARIF, MD formats.
+You can use the result of Oligo scanner in order to comment on the PR, upload to the workflow [Artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts), or even open new GitHub Issue in your account.
+### Commenting PR
+<img width="852" alt="image" src="https://github.com/OligoCyberSecurity/oligo-code-scanner/assets/112797342/a1c8eda2-42ce-4fb1-a55f-fdf83686625a">
 
-Results containing the new vulnerable packages will be logged out in the workflow run logs, but also may be viewed by clicking the output files in the [Artifacts section](https://docs.github.com/en/actions/managing-workflow-runs/downloading-workflow-artifacts) of the the failed run screen.
+
+Adding the next code to your workflow file will comment the results of the action in the PR:
+
+```yaml
+      - name: Add Oligo scanning results on Pull-request
+        if: ${{ steps.scan.outcome != 'success' }}
+        uses: mshick/add-pr-comment@v1
+        with:
+          message: |
+            New vulnerabilites detected:
+            ${{steps.scan.outputs.markdown}}
+          repo-token: ${{ secret }}
+          allow-repeats: false # Set to true to comment on every run
+```
+### Prevent Merging PR
+
+Setting `fail-build`  to `true` will cause the action to fail. In order to block PR from being merged when there is a new vulnerability, you need to change your repository setting and [add a new status check](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging).
+
+## Arguments
+|Argument  |Description |Default |Required | Options |
+|--|--|--|--|--|
+| `only-fixed` | Specify whether to only report vulnerabilities that have a fix available. |  `false`| X | `false`, `true`| 
+| `severity-cutoff` |  Optionally specify the minimum vulnerability severity to trigger an "error" level ACS result. Any vulnerability with a severity less than this value will lead to a "warning" result.  Default is "medium".| `medium`| X | `negligible`, `low`, `medium`, `high`, `critical` |
+| `output-format` | Set the output parameter after successful action execution.  | `json` |X  | `json`, `sarif`, `table` |
+| `fail-build` |Set to false to avoid failing based on severity-cutoff. | `true`  | X | `true`, `false` |
+| `path` | The path of the checked-out feature branch to scan. | `.` | V  | Any valid path |
+| `base-path` | The path of the target branch to scan. This is the path that will be used to resolve the difference with the feature branch code. |  `.`|X  | Any valid path |
+
