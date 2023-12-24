@@ -6,11 +6,11 @@ branding:
 inputs:
   base-path:
     description:
-      'The base path to scan. This is the path that will be used to resolve the
-      difference'
+      'The base path of the target branch to scan. This is the path that will be used to resolve the
+      difference with the feature branch code'
     required: false
   path:
-    description: 'The path to scan'
+    description: 'The path of the checked-out feature branch to scan'
     required: true
     default: '.'
   fail-build:
