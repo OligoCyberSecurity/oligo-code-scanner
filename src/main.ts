@@ -16,9 +16,9 @@ export async function run(): Promise<void> {
     const outputFormat = core.getInput('output-format') || 'json'
     const severityCutoff = core.getInput('severity-cutoff') || 'medium'
     const onlyFixed = core.getInput('only-fixed') || 'false'
-    const addCpesIfNone = core.getInput('add-cpes-if-none') || 'false'
-    const byCve = core.getInput('by-cve') || 'true'
-    const vex = core.getInput('vex') || ''
+    const addCpesIfNone = 'false'
+    const byCve = 'true'
+    const vex = ''
 
     const out = await runScan({
       source: sourceArray.head,
@@ -69,10 +69,12 @@ export async function run(): Promise<void> {
 
       if (results) {
         core.info(`${results?.length} Vulnerabilities found`)
-        core.setOutput('json', results)
-        core.info(`output json: ${JSON.stringify(results)}`)
         if (results?.length > 0) {
-          core.setOutput('markdown', tablemark(mapToReport(results)))
+          const report = mapToReport(results)
+          core.setOutput('json', report)
+          const reportTable = tablemark(report)
+          core.setOutput('markdown', reportTable)
+          core.info(`output : ${reportTable}`)
         }
       }
       if (failBuild === 'true' && results && results?.length > 0) {

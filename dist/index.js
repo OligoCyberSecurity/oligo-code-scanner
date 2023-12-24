@@ -31216,9 +31216,9 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const GRYPE_VERSION = 'v0.73.4';
+const GRYPE_VERSION = 'v0.73.5';
 const grypeBinary = 'grype';
-const grypeVersion = core.getInput('grype-version') || GRYPE_VERSION;
+const grypeVersion = GRYPE_VERSION;
 function getResultsDiff(head, base) {
     const results = [];
     for (const headItem of head) {
@@ -31630,9 +31630,9 @@ function run() {
             const outputFormat = core.getInput('output-format') || 'json';
             const severityCutoff = core.getInput('severity-cutoff') || 'medium';
             const onlyFixed = core.getInput('only-fixed') || 'false';
-            const addCpesIfNone = core.getInput('add-cpes-if-none') || 'false';
-            const byCve = core.getInput('by-cve') || 'true';
-            const vex = core.getInput('vex') || '';
+            const addCpesIfNone = 'false';
+            const byCve = 'true';
+            const vex = '';
             const out = yield runScan({
                 source: sourceArray.head,
                 failBuild: 'false',
@@ -31684,10 +31684,12 @@ function run() {
                 const results = out.json;
                 if (results) {
                     core.info(`${results === null || results === void 0 ? void 0 : results.length} Vulnerabilities found`);
-                    core.setOutput('json', results);
-                    core.info(`output json: ${JSON.stringify(results)}`);
                     if ((results === null || results === void 0 ? void 0 : results.length) > 0) {
-                        core.setOutput('markdown', tablemark_dist(mapToReport(results)));
+                        const report = mapToReport(results);
+                        core.setOutput('json', report);
+                        const reportTable = tablemark_dist(report);
+                        core.setOutput('markdown', reportTable);
+                        core.info(`output : ${reportTable}`);
                     }
                 }
                 if (failBuild === 'true' && results && (results === null || results === void 0 ? void 0 : results.length) > 0) {
