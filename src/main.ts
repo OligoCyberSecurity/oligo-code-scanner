@@ -76,6 +76,6 @@ export async function run(): Promise<void> {
       }
     }
   } catch (error) {
-    core.setFailed('Action failed')
+    core.setFailed(`Action failed ${error}`)
   }
 }
