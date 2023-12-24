@@ -31322,7 +31322,7 @@ function sourceInput() {
 function runScan({ source, failBuild, severityCutoff, onlyFixed, outputFormat, addCpesIfNone, byCve, vex }) {
     return __awaiter(this, void 0, void 0, function* () {
         const out = {};
-        const env = Object.assign(Object.assign({}, process.env), { GRYPE_CHECK_FOR_APP_UPDATE: 'false' });
+        const env = Object.assign(Object.assign({}, process.env), { GRYPE_CHECK_FOR_APP_UPDATE: 'true' });
         const SEVERITY_LIST = ['negligible', 'low', 'medium', 'high', 'critical'];
         const FORMAT_LIST = ['sarif', 'json', 'table'];
         const cmdArgs = [];
@@ -31413,7 +31413,12 @@ function runScan({ source, failBuild, severityCutoff, onlyFixed, outputFormat, a
             case 'json': {
                 // const REPORT_FILE = "./results.json";
                 // fs.writeFileSync(REPORT_FILE, );
-                out.json = JSON.parse(cmdOutput).matches;
+                try {
+                    out.json = JSON.parse(cmdOutput).matches;
+                }
+                catch (_a) {
+                    out.json = [];
+                }
                 break;
             }
             default: // e.g. table

@@ -190,7 +190,7 @@ export async function runScan({
 
   const env = {
     ...process.env,
-    GRYPE_CHECK_FOR_APP_UPDATE: 'false'
+    GRYPE_CHECK_FOR_APP_UPDATE: 'true'
   }
 
   const SEVERITY_LIST = ['negligible', 'low', 'medium', 'high', 'critical']
@@ -309,7 +309,11 @@ export async function runScan({
     case 'json': {
       // const REPORT_FILE = "./results.json";
       // fs.writeFileSync(REPORT_FILE, );
-      out.json = JSON.parse(cmdOutput).matches
+      try {
+        out.json = JSON.parse(cmdOutput).matches
+      } catch {
+        out.json = []
+      }
       break
     }
     default: // e.g. table
