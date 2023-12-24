@@ -31293,7 +31293,7 @@ function multipleDefined(...args) {
 }
 function sourceInput() {
     // var image = core.getInput("image");
-    let path = core.getInput('head-path');
+    let path = core.getInput('path');
     const basePath = core.getInput('base-path');
     // var sbom = core.getInput("sbom");
     // if (multipleDefined(image, path, sbom)) {
@@ -31427,15 +31427,11 @@ function runScan({ source, failBuild, severityCutoff, onlyFixed, outputFormat, a
                 // a grype problem
                 core.warning('grype had a non-zero exit status when running');
             }
-            else if (parsedFailBuild === true) {
-                core.setFailed(`Failed minimum severity level. Found vulnerabilities with level '${severityCutoff}' or higher`);
-            }
-            else {
-                // There is a non-zero exit status code with severity cut off, although there is still a chance this is grype
-                // that is broken, it will most probably be a failed severity. Using warning here will make it bubble up in the
-                // Actions UI
+            // There is a non-zero exit status code with severity cut off, although there is still a chance this is grype
+            // that is broken, it will most probably be a failed severity. Using warning here will make it bubble up in the
+            // Actions UI
+            else
                 core.warning(`Failed minimum severity level. Found vulnerabilities with level '${severityCutoff}' or higher`);
-            }
         }
         return out;
     });
@@ -31657,7 +31653,7 @@ function run() {
                 // core.setOutput("json", out.json);
                 if (out.json && outbase.json) {
                     const results = getResultsDiff(out.json, outbase.json);
-                    core.warning(`${results.length} Vulnerabilities found`);
+                    core.notice(`${results.length} Vulnerabilities found`);
                     if (results.length > 0) {
                         const report = mapToReport(results);
                         core.setOutput('json', report);
@@ -31672,7 +31668,7 @@ function run() {
                     }
                     else {
                         if (results.length === 0) {
-                            core.info(`No Vulnerabilities found`);
+                            core.notice(`No Vulnerabilities found`);
                         }
                         else {
                             core.warning(`${results.length} Vulnerabilities found`);
@@ -31684,12 +31680,15 @@ function run() {
                 const results = out.json;
                 core.info(`${results === null || results === void 0 ? void 0 : results.length} Vulnerabilities found`);
                 core.setOutput('json', results);
+                if (results) {
+                    core.setOutput('markdown', tablemark_dist(mapToReport(results)));
+                }
                 if (failBuild === 'true' && results && (results === null || results === void 0 ? void 0 : results.length) > 0) {
                     core.setFailed(`${results.length} Vulnerabilities found`);
                 }
             }
         }
-        catch (_a) {
+        catch (error) {
             core.setFailed('Action failed');
         }
     });

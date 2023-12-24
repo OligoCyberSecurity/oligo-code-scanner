@@ -45,7 +45,7 @@ export async function run(): Promise<void> {
       // core.setOutput("json", out.json);
       if (out.json && outbase.json) {
         const results = getResultsDiff(out.json, outbase.json)
-        core.warning(`${results.length} Vulnerabilities found`)
+        core.notice(`${results.length} Vulnerabilities found`)
         if (results.length > 0) {
           const report = mapToReport(results)
           core.setOutput('json', report)
@@ -58,7 +58,7 @@ export async function run(): Promise<void> {
           core.setFailed(`${results.length} Vulnerabilities found`)
         } else {
           if (results.length === 0) {
-            core.info(`No Vulnerabilities found`)
+            core.notice(`No Vulnerabilities found`)
           } else {
             core.warning(`${results.length} Vulnerabilities found`)
           }
@@ -68,11 +68,14 @@ export async function run(): Promise<void> {
       const results = out.json
       core.info(`${results?.length} Vulnerabilities found`)
       core.setOutput('json', results)
+      if (results) {
+        core.setOutput('markdown', tablemark(mapToReport(results)))
+      }
       if (failBuild === 'true' && results && results?.length > 0) {
         core.setFailed(`${results.length} Vulnerabilities found`)
       }
     }
-  } catch {
+  } catch (error) {
     core.setFailed('Action failed')
   }
 }

@@ -130,7 +130,7 @@ export function multipleDefined(...args: string[]): boolean {
 
 export function sourceInput(): { head: string; base?: string } {
   // var image = core.getInput("image");
-  let path = core.getInput('head-path')
+  let path = core.getInput('path')
   const basePath = core.getInput('base-path')
   // var sbom = core.getInput("sbom");
 
@@ -323,18 +323,14 @@ export async function runScan({
       // There was a non-zero exit status but it wasn't because of failing severity, this must be
       // a grype problem
       core.warning('grype had a non-zero exit status when running')
-    } else if (parsedFailBuild === true) {
-      core.setFailed(
-        `Failed minimum severity level. Found vulnerabilities with level '${severityCutoff}' or higher`
-      )
-    } else {
-      // There is a non-zero exit status code with severity cut off, although there is still a chance this is grype
-      // that is broken, it will most probably be a failed severity. Using warning here will make it bubble up in the
-      // Actions UI
+    }
+    // There is a non-zero exit status code with severity cut off, although there is still a chance this is grype
+    // that is broken, it will most probably be a failed severity. Using warning here will make it bubble up in the
+    // Actions UI
+    else
       core.warning(
         `Failed minimum severity level. Found vulnerabilities with level '${severityCutoff}' or higher`
       )
-    }
   }
 
   return out
