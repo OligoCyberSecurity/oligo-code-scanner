@@ -3,7 +3,7 @@ import * as exec from '@actions/exec'
 import * as cache from '@actions/tool-cache'
 
 import stream from 'stream'
-const GRYPE_VERSION = 'v0.73.5'
+const GRYPE_VERSION = 'v0.74.5'
 const grypeBinary = 'grype'
 const grypeVersion = GRYPE_VERSION
 export interface IVulnerability {

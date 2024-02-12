@@ -31216,7 +31216,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const GRYPE_VERSION = 'v0.73.5';
+const GRYPE_VERSION = 'v0.74.5';
 const grypeBinary = 'grype';
 const grypeVersion = GRYPE_VERSION;
 function getResultsDiff(head, base) {
