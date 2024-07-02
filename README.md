@@ -52,7 +52,7 @@ jobs:
 
       - name: Scan both feature & main branches and compare output differences
         id: scan
-        uses: OligoCyberSecurity/oligo-code-scanner@v1.0.6
+        uses: OligoCyberSecurity/oligo-code-scanner@v1.0.7
         continue-on-error: true
         with:
           path: './main'
