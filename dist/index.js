@@ -31216,7 +31216,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const GRYPE_VERSION = 'v0.74.5';
+const GRYPE_VERSION = 'v0.79.1';
 const grypeBinary = 'grype';
 const grypeVersion = GRYPE_VERSION;
 function getResultsDiff(head, base) {
@@ -31630,7 +31630,7 @@ function run() {
             const outputFormat = core.getInput('output-format') || 'json';
             const severityCutoff = core.getInput('severity-cutoff') || 'medium';
             const onlyFixed = core.getInput('only-fixed') || 'false';
-            const addCpesIfNone = 'false';
+            const addCpesIfNone = 'true';
             const byCve = 'true';
             const vex = '';
             const out = yield runScan({

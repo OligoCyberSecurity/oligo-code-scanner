@@ -16,7 +16,7 @@ export async function run(): Promise<void> {
     const outputFormat = core.getInput('output-format') || 'json'
     const severityCutoff = core.getInput('severity-cutoff') || 'medium'
     const onlyFixed = core.getInput('only-fixed') || 'false'
-    const addCpesIfNone = 'false'
+    const addCpesIfNone = 'true'
     const byCve = 'true'
     const vex = ''
 
