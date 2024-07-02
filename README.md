@@ -67,9 +67,9 @@ jobs:
 Oligo scanner saves the results in the jobs's `outputs` variable in JSON, SARIF, MD formats.
 You can use the result of Oligo scanner in order to comment on the PR, upload to the workflow [Artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts), or even open new GitHub Issue in your account.
 
-### Commenting PR
+### Commenting PR]
 
-![alt text](/assets/112797342/a1c8eda2-42ce-4fb1-a55f-fdf83686625a "Title")
+![alt text](https://github.com/OligoCyberSecurity/oligo-code-scanner/assets/112797342/a1c8eda2-42ce-4fb1-a55f-fdf83686625a "Title")
 
 Adding the next code to your workflow file will comment the results of the action in the PR:
 
