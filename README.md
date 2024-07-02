@@ -1,5 +1,4 @@
 
-
 # Oligo Code Scanner
 
 Scanning your project on each pull request can help you keep vulnerabilities out of your project.
@@ -53,7 +52,7 @@ jobs:
 
       - name: Scan both feature & main branches and compare output differences
         id: scan
-        uses: OligoCyberSecurity/oligo-code-scanner@v1.0.5
+        uses: OligoCyberSecurity/oligo-code-scanner@v1.0.6
         continue-on-error: true
         with:
           path: './main'
@@ -64,11 +63,13 @@ jobs:
 ```
 
 ## Examples
+
 Oligo scanner saves the results in the jobs's `outputs` variable in JSON, SARIF, MD formats.
 You can use the result of Oligo scanner in order to comment on the PR, upload to the workflow [Artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts), or even open new GitHub Issue in your account.
-### Commenting PR
-<img width="852" alt="image" src="https://github.com/OligoCyberSecurity/oligo-code-scanner/assets/112797342/a1c8eda2-42ce-4fb1-a55f-fdf83686625a">
 
+### Commenting PR
+
+![alt text](/assets/112797342/a1c8eda2-42ce-4fb1-a55f-fdf83686625a "Title")
 
 Adding the next code to your workflow file will comment the results of the action in the PR:
 
@@ -83,17 +84,18 @@ Adding the next code to your workflow file will comment the results of the actio
           repo-token: ${{ secret }}
           allow-repeats: false # Set to true to comment on every run
 ```
+
 ### Prevent Merging PR
 
 Setting `fail-build`  to `true` will cause the action to fail. In order to block PR from being merged when there is a new vulnerability, you need to change your repository setting and [add a new status check](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging).
 
 ## Arguments
+
 |Argument  |Description |Default |Required | Options |
 |--|--|--|--|--|
-| `only-fixed` | Specify whether to only report vulnerabilities that have a fix available. |  `false`| :x: | `false`, `true`| 
+| `only-fixed` | Specify whether to only report vulnerabilities that have a fix available. |  `false`| :x: | `false`, `true`|
 | `severity-cutoff` |  Optionally specify the minimum vulnerability severity to trigger an "error" level ACS result. Any vulnerability with a severity less than this value will lead to a "warning" result.  Default is "medium".| `medium`| :x: | `negligible`, `low`, `medium`, `high`, `critical` |
 | `output-format` | Set the output parameter after successful action execution.  | `json` |:x:| `json`, `sarif`, `table` |
 | `fail-build` |Set to false to avoid failing based on severity-cutoff. | `true`  | :x: | `true`, `false` |
 | `path` | The path of the checked-out feature branch to scan. | `.` | :white_check_mark:  | Any valid path |
 | `base-path` | The path of the target branch to scan. This is the path that will be used to resolve the difference with the feature branch code. |  `.`|:x:  | Any valid path |
-
